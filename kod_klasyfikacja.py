@@ -42,10 +42,10 @@ class CNNModel(nn.Module):
         super(CNNModel, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, 3, padding=1)
         self.conv2 = nn.Conv2d(32, 64, 3, padding=1)
-        self.conv3 = nn.Conv2d(64, 128, 3, padding=1) #liczba 0 wokół) #lupa
-        self.pool = nn.MaxPool2d(2, 2) #wybieranie maks wartosci
-        self.flatten = nn.Flatten() #spłaszczenie do rzędu liczb
-        self.dropout = nn.Dropout(p=0.2) #bedzie zerowal 20% elementów
+        self.conv3 = nn.Conv2d(64, 128, 3, padding=1) 
+        self.pool = nn.MaxPool2d(2, 2)
+        self.flatten = nn.Flatten() 
+        self.dropout = nn.Dropout(p=0.2) 
         self.fc1 = nn.Linear(128 * 8 * 8, 64)
         self.fc2 = nn.Linear(64, 4)
 
@@ -68,7 +68,7 @@ class CNNModel(nn.Module):
 net = CNNModel().to(device)
 kryt = nn.CrossEntropyLoss()
 optimizer = optim.Adam(net.parameters(), lr=0.001)
-best_val_loss = np.inf #nieskonczonosc, żeby kazda liczba byla lepsza od tego
+best_val_loss = np.inf 
 
 # Early stopping params (patience and counter):
 patience = 3 #tyle razy możemy wytrzymać pogorszenie loss
@@ -83,9 +83,9 @@ for epoch in range(15):
         inputs, labels = inputs.to(device), labels.to(device)
         optimizer.zero_grad()
         outputs = net(inputs) #wyniki z sieci
-        loss=kryt(outputs, labels) #liczymy strate
-        loss.backward() #liczymy gradient, jak poprawic wagi
-        optimizer.step() #uzupełnia wagi
+        loss=kryt(outputs, labels)
+        loss.backward() 
+        optimizer.step()
         train_loss += loss.item()
 
     net.eval()
@@ -106,7 +106,7 @@ for epoch in range(15):
         torch.save(net.state_dict(), 'best_model.pth')
         counter = 0
     else:
-        counter += 1 #powiekszamy counter, jak dobije do maks lossu to early stop 
+        counter += 1 
         print(f"Validation loss did not improve {counter} times")
 
     if counter >= patience:
@@ -151,8 +151,8 @@ p_test = np.concatenate(p_test)
 
 
 # ACC AUC dla CNN
-ACC_cnn = np.mean(y_test == np.argmax(p_test, axis=1)) #accuracy
-AUC_cnn = roc_auc_score(y_test, p_test, multi_class="ovr") #Area under curve
+ACC_cnn = np.mean(y_test == np.argmax(p_test, axis=1)) 
+AUC_cnn = roc_auc_score(y_test, p_test, multi_class="ovr") 
 
 # Metryka zew klasyfikatora
 y_pred_clf = clf.predict(X_test)
@@ -160,7 +160,7 @@ y_pred_clf_proba = clf.predict_proba(X_test)
 print(f"y_pred_clf = {y_pred_clf}")
 print(f"y_pred_clf_proba = {y_pred_clf_proba}")
 ACC_clf = np.mean(y_test == y_pred_clf)
-AUC_clf = roc_auc_score(y_test, y_pred_clf_proba, multi_class="ovr") #Area Under Curve czyli jak dobrze klasyfikuje do klas
+AUC_clf = roc_auc_score(y_test, y_pred_clf_proba, multi_class="ovr") 
 
 print(f"CNN: ACC={ACC_cnn:.4f}, AUC={AUC_cnn:.4f}")
 print(f"clf: ACC={ACC_clf:.4f}, AUC={AUC_clf:.4f}")
